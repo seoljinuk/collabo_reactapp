@@ -27,9 +27,21 @@ function App() {
       console.log('로그인 성공');
    }
 
+   const navigate = useNavigate();
+
+   // 로그인한 사용자가 '로그 아웃' 버튼을 클릭했습니다.
+   const handleLogout = (event) => {
+      event.preventDefault();
+
+      setUser(null);
+      localStorage.removeItem('user');
+      console.log('로그 아웃 성공');
+      navigate(`/member/login`);
+   };
+
    return (
       <>
-         <MenuItems appName={appName} user={user} />
+         <MenuItems appName={appName} user={user} handleLogout={handleLogout} />
 
          {/* 분리된 라우터 정보 */}
          <AppRouters user={user} handleLoginSuccess={handleLoginSuccess} />

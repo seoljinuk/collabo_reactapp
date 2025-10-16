@@ -2,7 +2,7 @@ import { NavDropdown, Navbar, Container, Nav } from "react-bootstrap";
 
 import { useNavigate } from "react-router-dom";
 
-function App({ appName, user }) {
+function App({ appName, user, handleLogout }) {
     const navigate = useNavigate();
 
     // user 프롭스를 사용하여 상단에 보이는 풀다운 메뉴를 적절히 분기 처리합니다.
@@ -14,7 +14,7 @@ function App({ appName, user }) {
                         <Nav.Link onClick={``}>상품 등록</Nav.Link>
                         {/* 관리자는 모든 사람의 주문 내역 확인 */}
                         <Nav.Link onClick={``}>주문 내역</Nav.Link>
-                        <Nav.Link onClick={``}>로그 아웃</Nav.Link>
+                        <Nav.Link onClick={handleLogout}>로그 아웃</Nav.Link>
                     </>
                 );
             case 'USER':
@@ -22,7 +22,7 @@ function App({ appName, user }) {
                     <>
                         <Nav.Link onClick={``}>장바구니</Nav.Link>
                         <Nav.Link onClick={``}>주문 내역</Nav.Link>
-                        <Nav.Link onClick={``}>로그 아웃</Nav.Link>
+                        <Nav.Link onClick={handleLogout}>로그 아웃</Nav.Link>
                     </>
                 );
             default:
