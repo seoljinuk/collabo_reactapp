@@ -11,7 +11,7 @@ function App({ appName, user, handleLogout }) {
             case 'ADMIN':
                 return (
                     <>
-                        <Nav.Link onClick={``}>상품 등록</Nav.Link>
+                        <Nav.Link onClick={() => navigate(`/product/insert`)}>상품 등록</Nav.Link>
                         {/* 관리자는 모든 사람의 주문 내역 확인 */}
                         <Nav.Link onClick={``}>주문 내역</Nav.Link>
                         <Nav.Link onClick={handleLogout}>로그 아웃</Nav.Link>
