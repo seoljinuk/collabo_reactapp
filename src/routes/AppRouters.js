@@ -9,6 +9,8 @@ import ProductList from './../pages/ProductList';
 import ProductInsertForm from './../pages/ProductInsertForm';
 import ProductUpdateForm from './../pages/ProductUpdateForm';
 import ProductDetail from './../pages/ProductDetail';
+import CartList from './../pages/CartList';
+
 
 function App({ user, handleLoginSuccess }) {
     return (
@@ -27,6 +29,8 @@ function App({ user, handleLoginSuccess }) {
 
             {/* 미로그인시 `장바구니`와 `구매하기` 기능은 선택이 불가능해야 하므로, user를 프롭스로 넘겨 줍니다. */}
             <Route path='/product/detail/:id' element={<ProductDetail user={user} />} />
+
+            <Route path='/cart/list' element={<CartList user={user} />} />
 
             <Route path='/fruit' element={<FruitOne />} />
             <Route path='/fruit/list' element={<FruitList />} />
