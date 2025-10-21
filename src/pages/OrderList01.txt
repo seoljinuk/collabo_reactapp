@@ -27,8 +27,8 @@ function App({ user }) {
 
                 // get 방식은 파라미터를 넘길 때, params라는 키를 사용하여 넘겨야 합니다.
                 const parameters = {
-                    params: { memberId: user.id },
-                    withCredentials: true // ✅ 인증 정보(쿠키/세션) 포함 옵션
+                    params: { memberId: user.id, role: user.role },
+                    withCredentials: true
                 };
                 const response = await axios.get(url, parameters);
 

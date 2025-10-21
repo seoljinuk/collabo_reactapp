@@ -52,6 +52,45 @@ function App({ user }) {
     const makeStatusButton = (bean) => {
         if (user?.role !== "ADMIN" && user?.role !== "USER") return null;
 
+        // `완료` 버튼을 클릭하여 `PENDING` 모드를 `COMPLETED` 모드로 변경합니다.
+        const changeCompleted = async (newStatus) => {
+            try {
+                const url = `${API_BASE_URL}/order/update/status/${bean.orderId}?status=${newStatus}`;
+                await axios.put(url);
+
+                alert(`송장 번호 ${bean.orderId}의 주문 상태가 ${newStatus}으로 변경이 되었습니다.`);
+
+                // `COMPLETED` 모드로 변경되고 나면, 화면에 보이지 않습니다.
+                // bean.orderId와 동일하지 않은 항목들만 다시 rendering 합니다.
+                setOrders((previous) =>
+                    previous.filter((order) => order.orderId !== bean.orderId)
+                );
+
+            } catch (error) {
+                console.log(error);
+                alert('상태 변경(주문 완료)에 실패하였습니다.');
+            }
+        };
+
+        // `취소` 버튼을 클릭하여 `대기 상태`인 주문 내역을 취소합니다.
+        const orderCancel = async () => {
+            try {
+                const url = `${API_BASE_URL}/order/delete/${bean.orderId}`;
+                await axios.delete(url, { withCredentials: true });
+
+                alert(`송장 번호 ${bean.orderId}의 주문이 취소 되었습니다.`);
+
+                // bean.orderId와 동일하지 않은 항목들만 다시 rendering 합니다.
+                setOrders((previous) =>
+                    previous.filter((order) => order.orderId !== bean.orderId)
+                );
+
+            } catch (error) {
+                console.log(error);
+                alert('주문 취소에 실패하였습니다.');
+            }
+        };
+
         return (
             <div className="d-flex align-items-center">
                 {/* ✅ 관리자일 때 사용자 이름 표시 */}
@@ -73,7 +112,8 @@ function App({ user }) {
                         variant="success"
                         size="sm"
                         className="me-2"
-                        onClick={``}>
+                        onClick={() => changeCompleted('COMPLETED')}
+                    >
                         완료
                     </Button>
                 )}
@@ -82,7 +122,8 @@ function App({ user }) {
                     variant="danger"
                     size="sm"
                     className="me-2"
-                    onClick={``}>
+                    onClick={() => orderCancel()}
+                >
                     취소
                 </Button>
             </div>
