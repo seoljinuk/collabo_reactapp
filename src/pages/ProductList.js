@@ -1,7 +1,7 @@
 import axios from "axios";
 
 import { useEffect, useState } from "react";
-import { Button, Card, Col, Container, Row } from "react-bootstrap";
+import { Button, Card, Col, Container, Pagination, Row } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 
 import { API_BASE_URL } from "../config/config";
@@ -21,22 +21,80 @@ function App({ user }) {
     // 스프링에서 넘겨 받은 상품 목록 state
     const [products, setProducts] = useState([]);
 
+    // 페이징과 관련된 state를 정의합니다.
+    const [paging, setPaging] = useState({
+        totalElements: 0, // 전체 데이터 개수(165개)
+        pageSize: 6, // 1페이지에 보여 주는 데이터 개수(6개)
+        totalPages: 0, // 전체 페이지 개수(28페이지)
+        pageNumber: 0, // 현재 페이지 번호(20페이지)
+        pageCount: 10, // 페이지 하단 버튼의 개수(10개)
+        beginPage: 0, // 페이징 시작 번호 
+        endPage: 0, //페이징 끝 번호
+        pagingStatus: '', // : "pageNumber/ totalPages 페이지"
+        // 자바의 SearchDto 클래스 연관 필드(field)
+        searchDateType: 'all', // 기간 검색 콤보 박스
+        category: '', // 검색하고자 하는 특정 카테고리 콤보 박스
+        searchMode: '', // 상품 검색 모드 콤보 박스_상품 이름(name) 또는 상품 설명(description)
+        searchKeyword: '' // 검색 키워드 입력 상자
+    });
+
     // 스프링 부트에 "상품 목록"을 요청하기
     useEffect(() => {
         const url = `${API_BASE_URL}/product/list`;
 
+        const parameters = {
+            params: {
+                pageNumber: paging.pageNumber,
+                pageSize: paging.pageSize,
+                searchDateType: paging.searchDateType,
+                category: paging.category,
+                searchMode: paging.searchMode,
+                searchKeyword: paging.searchKeyword,
+            },
+            withCredentials: true
+        };
+
         axios
-            .get(url, {})
+            .get(url, parameters)
             .then((response) => {
                 console.log('응답 받은 데이터');
-                console.log(response.data);
-                setProducts(response.data);
+                console.log(response.data.content);
+                setProducts(response.data.content || []);
+
+                setPaging((previous) => {
+                    const totalElements = response.data.totalElements;
+                    const totalPages = response.data.totalPages;
+                    const pageNumber = response.data.pageable.pageNumber;
+
+                    // 만약 pageSize의 값이 고정적이라면 할당 받지 않아도 됩니다.
+                    // 단, 가변적인 경우 반드시 할당 받아야 합니다. 
+                    const pageSize = response.data.pageable.pageSize;
+
+                    //const pageCount = 10 // 고정 값으로 그냥 진행
+
+                    const beginPage = Math.floor(pageNumber / previous.pageCount) * previous.pageCount;
+                    const endPage = Math.min(beginPage + previous.pageCount - 1, totalPages - 1);
+
+                    // 주의) 0base이므로 +1을 해주어야 합니다.
+                    const pagingStatus = `${pageNumber + 1}/${totalPages} 페이지`;
+
+                    return {
+                        ...previous,
+                        totalElements: totalElements,
+                        totalPages: totalPages,
+                        pageNumber: pageNumber,
+                        pageSize: pageSize,
+                        beginPage: beginPage,
+                        endPage: endPage,
+                        pagingStatus: pagingStatus,
+                    };
+                });
             })
             .catch((error) => {
                 console.log(error);
             });
 
-    }, []);
+    }, [paging.pageNumber]);
 
     const navigate = useNavigate();
 
@@ -154,6 +212,78 @@ function App({ user }) {
             </Row>
 
             {/* 페이징 처리 영역 */}
+            <Pagination className="justify-content-center mt-4">
+                {/* 앞쪽 영역 */}
+                <Pagination.First
+                    onClick={() => {
+                        console.log('First 버튼 클릭(0 페이지로 이동)');
+                        setPaging((previous) => ({ ...previous, pageNumber: 0 }));
+                    }}
+                    disabled={paging.pageNumber < paging.pageCount}
+                    as="button"
+                >
+                    맨처음
+                </Pagination.First>
+
+                <Pagination.Prev
+                    onClick={() => {
+                        const gotoPage = paging.beginPage - 1;
+                        console.log(`Prev 버튼 클릭(${gotoPage} 페이지로 이동)`);
+                        setPaging((previous) => ({ ...previous, pageNumber: gotoPage }));
+                    }}
+                    disabled={paging.pageNumber < paging.pageCount}
+                    as="button"
+                >
+                    이전
+                </Pagination.Prev>
+
+                {/* 숫자 링크가 들어가는 영역 */}
+                {/* 숫자 링크가 들어가는 영역 */}
+                {[...Array(paging.endPage - paging.beginPage + 1)].map((_, idx) => {
+                    // pageIndex는 숫자 링크 번호입니다.
+                    const pageIndex = paging.beginPage + idx + 1;
+
+                    return (
+                        <Pagination.Item
+                            key={pageIndex}
+                            active={paging.pageNumber === (pageIndex - 1)}
+                            onClick={() => {
+                                console.log(`${pageIndex} 페이지로 이동하기`);
+                                setPaging((previous) => ({ ...previous, pageNumber: (pageIndex - 1) }));
+                            }}
+                        >
+                            {pageIndex}
+                        </Pagination.Item>
+                    )
+                })}
+
+
+
+                {/* 뒤쪽 영역 */}
+                <Pagination.Next
+                    onClick={() => {
+                        const gotoPage = paging.endPage + 1;
+                        console.log(`Next 버튼 클릭(${gotoPage} 페이지로 이동)`);
+                        setPaging((previous) => ({ ...previous, pageNumber: gotoPage }));
+                    }}
+                    disabled={paging.pageNumber >= Math.floor(paging.totalPages / paging.pageCount) * paging.pageCount}
+                    as="button"
+                >
+                    다음
+                </Pagination.Next>
+
+                <Pagination.Last
+                    onClick={() => {
+                        const gotoPage = paging.totalPages - 1;
+                        console.log(`Last 버튼 클릭(${gotoPage} 페이지로 이동)`);
+                        setPaging((previous) => ({ ...previous, pageNumber: gotoPage }));
+                    }}
+                    disabled={paging.pageNumber >= Math.floor(paging.totalPages / paging.pageCount) * paging.pageCount}
+                    as="button"
+                >
+                    맨끝
+                </Pagination.Last>
+            </Pagination>
 
         </Container>
     );
