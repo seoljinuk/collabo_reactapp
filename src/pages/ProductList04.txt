@@ -94,7 +94,7 @@ function App({ user }) {
                 console.log(error);
             });
 
-    }, [paging.pageNumber, paging.searchDateType, paging.category, paging.searchMode, paging.searchKeyword]);
+    }, [paging.pageNumber]);
 
     const navigate = useNavigate();
 
@@ -191,13 +191,7 @@ function App({ user }) {
                         <Form.Select
                             name="category"
                             value={paging.category}
-                            onChange={(e) =>
-                                setPaging((previous) => ({
-                                    ...previous,
-                                    category: e.target.value,
-                                    pageNumber: 0, // ✅ 카테고리 변경 시 0페이지부터 다시 조회
-                                }))
-                            }
+                            onChange={(e) => setPaging((previous) => ({ ...previous, category: e.target.value }))}
                         >
                             <option value="ALL">카테고리 선택</option>
                             <option value="BREAD">빵</option>
