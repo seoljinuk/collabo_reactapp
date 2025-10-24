@@ -35,6 +35,7 @@ function App({ user }) {
         axios
             .get(url, { withCredentials: true }) // 쿠키, 세션 포함 옵션
             .then((response) => {
+                console.log(response.data);
                 setProduct(response.data);
                 setLoading(false); // 상품 정보를 읽어 왔습니다.
             })

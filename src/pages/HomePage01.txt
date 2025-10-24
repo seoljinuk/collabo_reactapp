@@ -41,7 +41,7 @@ function App() {
                 <Carousel.Item>
                     <img
                         className="d-block w-100"
-                        src={`${API_BASE_URL}/images/whitewine01_bigsize.png`}
+                        src={`${API_BASE_URL}/images/white_wine_01_bigsize.png`}
                         alt="화이트 와인"
                     />
                     <Carousel.Caption>
